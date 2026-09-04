@@ -3,18 +3,48 @@ This is the official repository for [PhoenixCode](https://psa-alliance.my.canva.
 
 ## How to use this?
 
-To use this, you can open the official link and start coding, no account is required, or download the .html file and open it in your browser. If you want to turn it into an app, download the .html file and run the following commands in terminal (for macOS):
+To use this, you can open the official link and start coding, no account is required, or download the .html file and open it in your browser. If you want to turn it into an app, download the .html file and run the following commands in your terminal:
 
-download nativefier if needed
+### macOS
+
+install nativefier if needed
 
 ```bash
 npm install -g nativefier
 ```
 
-create the dekstop app
+create a dekstop app
 
 ```bash
 nativefier --name "Text Scratch" --width 1400 --height 900 ./code_editor.html
 ```
 
-# ⚠️ The app still has many bugs that will be fixed shortly, we do not suggest creating an app now
+### windows
+
+install nativefier if needed
+
+```bash
+npm install -g nativefier
+```
+
+create an app
+
+```bash
+nativefier --name "Text Scratch" --width 1400 --height 900 ./code_editor.html
+```
+
+### Linux
+
+install nativefier if needed
+
+```bash
+npm install -g nativefier
+```
+
+create an app
+
+```bash
+nativefier --name "Text Scratch" --width 1400 --height 900 ./code_editor.html
+```
+
+# ⚠️ This site still has a bunch of bugs that are currently being fixed, if you want a good coding app, wait until this warning disappears to create the app
