@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title><able class="" border="0">
+  
+</table>text Scratch</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;height:100vh;overflow:hidden;font-family:Arial,sans-serif;background:#17191d;color:#eee}
+#app{display:grid;grid-template-columns:285px 1fr 350px;height:100vh;min-height:0}
+#commands{background:#202329;border-right:1px solid #3b3f47;display:flex;flex-direction:column;min-height:0}
+header{padding:14px;border-bottom:1px solid #3b3f47}
+header .brandLogo{display:block;width:100%;max-height:58px;object-fit:contain;object-position:left center;margin-bottom:10px}
+header .brandLink{display:block}
+h1{font-size:20px;margin:0 0 5px}
+.sub{color:#aaa;font-size:12px}
+#list{padding:10px;overflow-y:auto;min-height:0}
+.group{color:#aaa;text-transform:uppercase;font-size:11px;font-weight:bold;margin:13px 5px 6px}
+.cmd{padding:8px 10px;margin:4px 0;border-radius:7px;background:#30343c;cursor:pointer;font:13px Menlo,Consolas,monospace}
+.cmd:hover{background:#414650}
+#editorWrap{display:flex;flex-direction:column;min-width:0}
+#bar{height:52px;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#24272d;border-bottom:1px solid #3b3f47}
+button{border:0;border-radius:7px;padding:8px 13px;font-weight:bold;cursor:pointer}
+
+#tabs{height:46px;display:flex;align-items:flex-end;background:#24272d;border-bottom:1px solid #3b3f47;padding-left:10px}
+.tab{height:42px;padding:0 22px;border-radius:8px 8px 0 0;background:transparent;color:#bbb;border-bottom:3px solid transparent}
+.tab:hover{background:#30343c;color:#fff}
+.tab.active{background:#30343c;color:#fff;border-bottom-color:#ff8b24}
+#codeView{display:flex;flex:1;min-height:0;flex-direction:column}
+.workspaceView{display:none;flex:1;min-height:0;flex-direction:column;background:#15171b}
+.workspaceView.active{display:flex}
+.workspaceToolbar{min-height:52px;display:flex;align-items:center;gap:7px;padding:8px 10px;background:#24272d;border-bottom:1px solid #3b3f47;flex-wrap:wrap}
+.tool{padding:7px 10px;background:#30343c;color:#eee;font-size:12px}
+.tool:hover{background:#414650}
+.tool.active{background:#ff8b24;color:#111}
+.toolSpacer{flex:1}
+.workspaceToolbar label{font-size:12px;color:#bbb;display:flex;align-items:center;gap:5px}
+.costumeWorkspace,.soundWorkspace{display:flex;flex:1;min-height:0}
+.costumeNames,.soundNames{width:175px;background:#202329;border-right:1px solid #3b3f47;overflow-y:auto;padding:9px}
+.costumeName,.soundName{padding:10px 9px;margin-bottom:5px;border-radius:7px;background:#2b2f36;font-size:12px;cursor:pointer}
+.costumeName.active,.soundName.active{background:#414650;border-left:3px solid #ff8b24}
+.costumeCanvasArea{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;background:#d8d8d8;background-image:linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+#mainCostumeCanvas{width:min(78%,620px);height:auto;background:transparent;box-shadow:0 1px 8px #0005;touch-action:none}
+.vectorCanvas{width:min(78%,620px);height:auto;background:repeating-conic-gradient(#fff 0 25%,#eee 0 50%) 0/20px 20px;box-shadow:0 1px 8px #0005;touch-action:none}
+.costumeInfo{position:absolute;top:10px;left:10px;background:#222d;padding:6px 9px;border-radius:6px;font-size:12px;z-index:2}
+.soundArea{flex:1;padding:30px;overflow:auto}
+.soundSelected{font-size:18px;font-weight:bold;margin-bottom:20px}
+.soundWave{height:170px;border:1px solid #555;border-radius:8px;background:repeating-linear-gradient(90deg,#292d34 0,#292d34 3px,#202329 3px,#202329 6px);position:relative;overflow:hidden}
+.soundWave canvas{width:100%;height:100%}
+.soundName small{display:block;color:#999;margin-top:3px}
+#costumeCanvas{touch-action:none}
+#soundList,#costumeList{max-height:100px;overflow:auto}
+#run{background:#45c96b;color:#06100a}#stop{background:#e85b5b;color:white}#reset{background:#454a54;color:white}
+#editor{flex:1;width:100%;resize:none;border:0;outline:0;background:#111318;color:#e8e8e8;padding:18px;font:14px/1.55 Menlo,Consolas,monospace;tab-size:2}
+#bottom{height:42px;background:#0d0f12;border-top:1px solid #3b3f47;padding:10px;overflow:auto;font:12px monospace;color:#bfc5cf;white-space:pre-wrap}
+#side{background:#202329;border-left:1px solid #3b3f47;padding:12px;overflow-y:auto;min-height:0;height:100vh;display:flex;flex-direction:column}
+h2{font-size:15px;margin:5px 0 10px}
+.panel{background:#292d34;border-radius:9px;padding:11px;margin-bottom:12px}
+#stagePanel{display:flex;justify-content:center;align-items:center;min-height:296px;flex:0 0 auto}
+#stage{width:270px;height:270px;flex:0 0 270px;background:white;border-radius:6px;position:relative;overflow:hidden;border:2px solid #555}
+.sprite{position:absolute;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;user-select:none}
+.sprite.extra{background:#4c9be8;cursor:pointer}.sprite.extra.selected{outline:3px solid #ff8b24;outline-offset:3px}
+#sprite{background:#ff8b24}
+.speech{position:absolute;display:none;max-width:190px;min-width:35px;padding:8px 11px;background:#fff;color:#111;border:2px solid #222;border-radius:14px;font-size:14px;line-height:1.25;box-shadow:0 2px 5px #0004;z-index:5;white-space:pre-wrap;word-wrap:break-word;pointer-events:none}
+.speech:after{content:"";position:absolute;left:18px;bottom:-9px;width:14px;height:14px;background:#fff;border-right:2px solid #222;border-bottom:2px solid #222;transform:rotate(45deg)}
+.thought{border-radius:18px}.thought:after{border-radius:50%;transform:none;bottom:-14px;left:18px;width:8px;height:8px}
+.stat{font:12px monospace;color:#cbd0d8;line-height:1.7;white-space:pre-wrap}
+.notice{font-size:12px;color:#aaa;line-height:1.5}
+#chatPanel{display:flex;flex-direction:column;min-height:250px}
+#chatMessages{height:220px;overflow-y:auto;background:#17191d;border-radius:7px;padding:8px;margin-bottom:8px}
+.chatMessage{padding:7px 9px;margin:5px 0;border-radius:7px;font-size:12px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.chatMessage.user{background:#39434f;margin-left:20px}.chatMessage.assistant{background:#303a2f;margin-right:20px}.chatMessage.system{color:#aaa;font-style:italic}
+#chatForm{display:flex;gap:6px}#chatInput{min-width:0;flex:1;resize:none;border:1px solid #4a5059;border-radius:6px;background:#111318;color:#eee;padding:7px;font:12px Arial,sans-serif}#chatSend{background:#ff8b24;color:#111;padding:7px 10px}
+.spritePanel{display:grid;grid-template-columns:1fr 1fr;gap:6px}.spritePanel .nameInput{grid-column:1/-1}.spriteList{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}.spriteItem{background:#30343c;color:#eee;border:0;border-radius:5px;padding:5px 7px;font-size:11px;cursor:pointer}.spriteItem.active{background:#ff8b24;color:#111}
+.vectorCanvas{cursor:crosshair}.vectorCanvas.selecting{cursor:default}.vectorObject{vector-effect:non-scaling-stroke}.vectorObject.selected{filter:drop-shadow(0 0 3px #ff8b24)}
+.selectionBox{fill:none;stroke:#ff8b24;stroke-width:2;stroke-dasharray:6 4;pointer-events:none}
+@media(max-width:900px){#app{grid-template-columns:220px 1fr}#side{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+<section id="commands">
+<header><a class="brandLink" href="https://psa-alliance.my.canva.site/code-home" target="_blank" rel="noopener noreferrer" aria-label="Open Code Home"><img class="brandLogo" src="https://dk1c2x70i7mfd.cloudfront.net/org_7Z7A99QFs4xvMcjbtZKgMBTVZ8DcvY8h/files/botp_YnXQtCpCsSNotePiu9MHa4CW8xwDco6J/f71508d3bf02e92634c81a18780616d38c878d49babb45177ffb15d9a8687299.png" alt="Code Home logo"></a><h1>Text Scratch</h1><div class="sub">Scratch blocks represented as text</div></header>
+<div id="list">
+<div class="group">Events</div>
+<div class="cmd" data-c="when green flag clicked">when green flag clicked</div>
+<div class="cmd" data-c="when this sprite clicked">when this sprite clicked</div>
+<div class="cmd" data-c="when I receive [message]">when I receive [message]</div>
+<div class="cmd" data-c="broadcast [message]">broadcast [message]</div>
+<div class="cmd" data-c="broadcast [message] and wait">broadcast [message] and wait</div>
+
+<div class="group">Motion</div>
+<div class="cmd" data-c="move 10 steps">move 10 steps</div>
+<div class="cmd" data-c="turn clockwise 15 degrees">turn clockwise 15 degrees</div>
+<div class="cmd" data-c="turn counterclockwise 15 degrees">turn counterclockwise 15 degrees</div>
+<div class="cmd" data-c="go to x: 0 y: 0">go to x: 0 y: 0</div>
+<div class="cmd" data-c="go to random position">go to random position</div>
+<div class="cmd" data-c="glide 1 seconds to x: 0 y: 0">glide 1 seconds to x: 0 y: 0</div>
+<div class="cmd" data-c="point in direction 90">point in direction 90</div>
+<div class="cmd" data-c="point towards mouse-pointer">point towards mouse-pointer</div>
+<div class="cmd" data-c="change x by 10">change x by 10</div>
+<div class="cmd" data-c="set x to 0">set x to 0</div>
+<div class="cmd" data-c="change y by 10">change y by 10</div>
+<div class="cmd" data-c="set y to 0">set y to 0</div>
+<div class="cmd" data-c="if on edge, bounce">if on edge, bounce</div>
+<div class="cmd" data-c="set rotation style left-right">set rotation style left-right</div>
+
+<div class="group">Looks</div>
+<div class="cmd" data-c="say Hello!">say Hello!</div>
+<div class="cmd" data-c="say Hello! for 2 seconds">say Hello! for 2 seconds</div>
+<div class="cmd" data-c="think Hmm...">think Hmm...</div>
+<div class="cmd" data-c="think Hmm... for 2 seconds">think Hmm... for 2 seconds</div>
+<div class="cmd" data-c="show">show</div>
+<div class="cmd" data-c="hide">hide</div>
+<div class="cmd" data-c="change size by 10">change size by 10</div>
+<div class="cmd" data-c="set size to 100">set size to 100</div>
+<div class="cmd" data-c="switch costume to costume1">switch costume to costume1</div>
+<div class="cmd" data-c="next costume">next costume</div>
+<div class="cmd" data-c="switch backdrop to backdrop1">switch backdrop to backdrop1</div>
+<div class="cmd" data-c="change effect color by 25">change effect color by 25</div>
+<div class="cmd" data-c="clear graphic effects">clear graphic effects</div>
+
+<div class="group">Sound</div>
+<div class="cmd" data-c="play sound [sound] until done">play sound [sound] until done</div>
+<div class="cmd" data-c="start sound [sound]">start sound [sound]</div>
+<div class="cmd" data-c="stop all sounds">stop all sounds</div>
+<div class="cmd" data-c="change volume by -10">change volume by -10</div>
+<div class="cmd" data-c="set volume to 100%">set volume to 100%</div>
+
+<div class="group">Control</div>
+<div class="cmd" data-c="wait 1 seconds">wait 1 seconds</div>
+<div class="cmd" data-c="repeat 10">repeat 10</div>
+<div class="cmd" data-c="forever">forever</div>
+<div class="cmd" data-c="if <condition>">if <condition></div>
+<div class="cmd" data-c="if <condition> else">if <condition> else</div>
+<div class="cmd" data-c="end loop">end loop</div>
+<div class="cmd" data-c="end script">end script</div>
+<div class="cmd" data-c="stop all">stop all</div>
+<div class="cmd" data-c="create clone of myself">create clone of myself</div>
+<div class="cmd" data-c="delete this clone">delete this clone</div>
+
+<div class="group">Sensing</div>
+<div class="cmd" data-c="ask What's your name? and wait">ask What's your name? and wait</div>
+<div class="cmd" data-c="reset timer">reset timer</div>
+<div class="cmd" data-c="set drag mode draggable">set drag mode draggable</div>
+<div class="cmd" data-c="set drag mode not draggable">set drag mode not draggable</div>
+<div class="cmd" data-c="touching edge?">touching edge?</div>
+<div class="cmd" data-c="key space pressed?">key space pressed?</div>
+
+<div class="group">Operators</div>
+<div class="cmd" data-c="set result to 2 + 2">set result to 2 + 2</div>
+<div class="cmd" data-c="set result to random 1 to 10">set result to random 1 to 10</div>
+<div class="cmd" data-c="set result to join hello world">set result to join hello world</div>
+<div class="cmd" data-c="set result to 10 mod 3">set result to 10 mod 3</div>
+<div class="cmd" data-c="set result to round 3.14">set result to round 3.14</div>
+
+<div class="group">Variables</div>
+<div class="cmd" data-c="set score to 0">set score to 0</div>
+<div class="cmd" data-c="change score by 1">change score by 1</div>
+<div class="cmd" data-c="show variable score">show variable score</div>
+<div class="cmd" data-c="hide variable score">hide variable score</div>
+<div class="cmd" data-c="add item hello to list">add item hello to list</div>
+<div class="cmd" data-c="delete all of list">delete all of list</div>
+<div class="cmd" data-c="delete 1 of list">delete 1 of list</div>
+<div class="cmd" data-c="insert hello at 1 of list">insert hello at 1 of list</div>
+<div class="cmd" data-c="replace item 1 of list with hello">replace item 1 of list with hello</div>
+<div class="cmd" data-c="show list list">show list list</div>
+<div class="cmd" data-c="hide list list">hide list list</div>
+</div>
+</section>
+
+<section id="editorWrap">
+<div id="tabs">
+  <button class="tab active" data-tab="code">Code</button>
+  <button class="tab" data-tab="costumes">Costumes</button>
+  <button class="tab" data-tab="sounds">Sounds</button>
+</div>
+<div id="codeView" class="workspaceView active">
+<div id="bar">
+<button id="run">▶ Green Flag</button><button id="stop">■ Stop</button><button id="reset">↻ Reset</button>
+<button id="aiGenerate" class="tool">✦ Generate with AI</button><button id="downloadSb3" class="tool">⇩ Download .sb3</button>
+<span style="margin-left:auto;font-size:12px;color:#999">Indentation = nested Scratch blocks</span>
+</div>
+<textarea id="editor" spellcheck="false">when green flag clicked
+  go to x: 0 y: 0
+  say Hello! for 2 seconds
+  repeat 4
+    move 50 steps
+    turn clockwise 90 degrees
+  end
+  say Done!</textarea>
+</div>
+
+<div id="costumeView" class="workspaceView">
+  <div class="workspaceToolbar">
+    <button id="costumeSelect" class="tool active">↖ Select</button>
+    <button id="costumeBrush" class="tool">✎ Brush</button>
+    <button id="costumeEraser" class="tool">⌫ Eraser</button>
+    <button id="costumeFill" class="tool">▣ Fill</button>
+    <button id="costumeLine" class="tool">╱ Line</button>
+    <button id="costumeRect" class="tool">□ Rectangle</button>
+    <button id="costumeEllipse" class="tool">○ Ellipse</button>
+    <button id="costumeText" class="tool">T Text</button>
+    <span class="toolSpacer"></span>
+    <label>Size <input id="costumeBrushSize" type="range" min="1" max="50" value="6"></label>
+    <input id="costumeColor" type="color" value="#ff8b24" title="Color">
+    <button id="costumeUndo" class="tool">↶ Undo</button>
+    <button id="costumeClear" class="tool">Clear</button>
+    <button id="newCostumeMain" class="tool">＋ New costume</button>
+    <input id="costumeNameInput" class="nameInput" type="text" placeholder="Costume name" maxlength="80">
+    <button id="renameCostumeMain" class="tool">Rename</button>
+    <button id="importCostumeMain" class="tool">Import SVG</button>
+    <input id="costumeFileMain" type="file" accept=".svg,image/svg+xml" hidden>
+  </div>
+  <div class="costumeWorkspace">
+    <div class="costumeNames" id="costumeNames"></div>
+    <div class="costumeCanvasArea">
+      <div class="costumeInfo" id="costumeInfo">Costume1</div>
+      <canvas id="mainCostumeCanvas" width="520" height="420" hidden></canvas>
+      <svg id="vectorCostumeCanvas" class="vectorCanvas" width="520" height="420" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+</div>
+
+<div id="soundView" class="workspaceView">
+  <div class="workspaceToolbar">
+    <button id="importSoundMain" class="tool">＋ Import sound</button>
+    <input id="soundFileMain" type="file" accept="audio/*" hidden>
+    <button id="playSelectedSound" class="tool">▶ Play</button>
+    <button id="stopSelectedSound" class="tool">■ Stop</button>
+    <input id="soundNameInput" class="nameInput" type="text" placeholder="Sound name" maxlength="80">
+    <button id="renameSoundMain" class="tool">Rename</button>
+    <span class="toolSpacer"></span>
+    <span class="notice">Sound editor intentionally not included.</span>
+  </div>
+  <div class="soundWorkspace">
+    <div class="soundNames" id="soundNames"></div>
+    <div class="soundArea">
+      <div id="soundEmpty">Import an audio file to add a sound.</div>
+      <div id="soundSelected" class="soundSelected"></div>
+      <div id="soundWave" class="soundWave"></div>
+    </div>
+  </div>
+</div>
+
+<div id="bottom">Ready. Click Green Flag to run the scripts.</div>
+</section>
+
+<section id="side">
+<h2>Stage</h2>
+<div class="panel" id="stagePanel"><div id="stage"><div id="sprite" class="sprite">🐱</div><div id="speech" class="speech"></div></div></div>
+<div class="panel spritePanel"><button id="newSprite" class="tool">＋ New sprite</button><button id="deleteSprite" class="tool">⌫ Delete</button><input id="spriteNameInput" class="nameInput" type="text" placeholder="Sprite name" maxlength="40"><button id="renameSprite" class="tool">Rename</button><div id="spriteList" class="spriteList"></div></div>
+<h2>Variables</h2><div class="panel stat" id="vars">No variables yet.</div>
+<h2>Lists</h2><div class="panel stat" id="lists">No lists yet.</div>
+<h2>AI Chat</h2>
+<div class="panel" id="chatPanel">
+<div id="chatMessages"><div class="chatMessage system">Ask for Scratch code, explain a block, or describe a change.</div></div>
+<form id="chatForm"><textarea id="chatInput" rows="2" placeholder="Ask the Scratch assistant..."></textarea><button id="chatSend" type="submit">Send</button></form>
+</div>
+<h2>Help</h2>
+<div class="panel notice">
+This is text-based Scratch syntax.
+
+Example:
+when green flag clicked
+  repeat 10
+    move 10 steps
+  end
+
+Scratch-style control blocks use indentation plus <b>end</b>.
+
+<b>end loop</b> ends the nearest repeat/forever loop.
+<b>end script</b> stops the entire running script.
+
+Expressions can use variables:
+set score to 10
+change score by 1
+set result to score + 5
+
+Code uses Scratch-style text blocks, and the Costumes tab is a vector SVG editor with SVG import.
+</div>
+</section>
+</div>
+
+<script>
+const editor=document.getElementById('editor');
+const log=document.getElementById('bottom');
+const sprite=document.getElementById('sprite');
+const stage=document.getElementById('stage');
+const speech=document.getElementById('speech');
+const varsEl=document.getElementById('vars');
+const listsEl=document.getElementById('lists');
+
+document.querySelectorAll('.cmd').forEach(c=>c.onclick=()=>{
+  const p=editor.selectionStart,v=editor.value;
+  const before=p&&v[p-1]!='\n'?'\n':'';
+  editor.value=v.slice(0,p)+before+c.dataset.c+'\n'+v.slice(editor.selectionEnd);
+  editor.focus();
+});
+
+const initial={
+ x:150,y:115,dir:90,size:100,visible:true,
+ vars:{},lists:{},stopped:false,deleted:false,
+ volume:100,drag:false,rotationStyle:'all around',
+ costumes:[{name:'Costume1',src:null}],currentCostume:0,sounds:[],
+ startTime:performance.now(),broadcastWaiters:new Map()
+};
+let state=structuredClone(initial);
+let scripts=[];
+const audioPlayers=new Set();
+const spriteList=document.getElementById('spriteList');
+const spriteNameInput=document.getElementById('spriteNameInput');
+const spriteRecords=[{id:'sprite-1',name:'Sprite1',element:sprite,primary:true}];
+let selectedSpriteId='sprite-1';
+
+function renderSpriteList(){
+  spriteList.innerHTML=spriteRecords.map(item=>`<button class="spriteItem ${item.id===selectedSpriteId?'active':''}" data-id="${item.id}">${escapeHtml(item.name)}</button>`).join('');
+  spriteList.querySelectorAll('[data-id]').forEach(button=>button.onclick=()=>selectSprite(button.dataset.id));
+}
+function selectSprite(id){
+  const item=spriteRecords.find(spriteItem=>spriteItem.id===id);if(!item)return;
+  selectedSpriteId=id;spriteRecords.forEach(spriteItem=>spriteItem.element.classList.toggle('selected',spriteItem.id===id));
+  spriteNameInput.value=item.name;renderSpriteList();
+}
+function createSprite(){
+  const index=spriteRecords.length+1,item={id:'sprite-'+Date.now(),name:'Sprite'+index};
+  const element=document.createElement('div');element.className='sprite extra';element.textContent='🐱';element.style.left=(35+(index*37)%190)+'px';element.style.top=(35+(index*53)%190)+'px';
+  const costume=state.costumes[state.currentCostume];if(costume?.src){element.style.backgroundImage=`url("${costume.src.replace(/"/g,'\\"')}")`;element.style.backgroundSize='contain';element.style.backgroundPosition='center';element.style.backgroundRepeat='no-repeat';element.style.backgroundColor='transparent';element.textContent=''}
+  item.element=element;stage.appendChild(element);spriteRecords.push(item);element.onclick=event=>{event.stopPropagation();selectSprite(item.id)};selectSprite(item.id);out('＋ Created '+item.name);
+}
+document.getElementById('newSprite').onclick=createSprite;
+document.getElementById('deleteSprite').onclick=()=>{if(selectedSpriteId==='sprite-1'){out('⚠ The main sprite cannot be deleted.');return}const index=spriteRecords.findIndex(item=>item.id===selectedSpriteId),item=spriteRecords[index];item.element.remove();spriteRecords.splice(index,1);selectSprite('sprite-1');out('⌫ Sprite deleted.')};
+document.getElementById('renameSprite').onclick=()=>{const item=spriteRecords.find(spriteItem=>spriteItem.id===selectedSpriteId),name=spriteNameInput.value.trim();if(item&&name){item.name=name;spriteNameInput.value='';renderSpriteList();out('✓ Sprite renamed.')}};
+spriteNameInput.onkeydown=event=>{if(event.key==='Enter')document.getElementById('renameSprite').click()};
+
+function sleep(ms){return new Promise(r=>setTimeout(r,Math.max(0,ms)))}
+function out(s){log.textContent=s}
+function val(s){return evaluate(String(s))}
+function num(s){const n=Number(val(s));return Number.isFinite(n)?n:0}
+function escReg(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+
+function render(){
+  sprite.style.left=(state.x-22)+'px';
+  sprite.style.top=(state.y-22)+'px';
+  sprite.style.transform=`rotate(${state.dir-90}deg) scale(${state.size/100})`;
+  sprite.style.display=state.visible&&!state.deleted?'flex':'none';
+  if(speech.style.display!=='none'){
+    speech.style.left=Math.max(4,state.x-35)+'px';
+    speech.style.top=Math.max(4,state.y-65)+'px';
+  }
+  const vk=Object.keys(state.vars);
+  varsEl.textContent=vk.length?vk.map(k=>k+' = '+state.vars[k]).join('\n'):'No variables yet.';
+  const lk=Object.keys(state.lists);
+  listsEl.textContent=lk.length?lk.map(k=>k+' = ['+state.lists[k].join(', ')+']').join('\n'):'No lists yet.';
+}
+
+function showSpeech(text,seconds=null,thought=false){
+  speech.textContent=text;
+  speech.classList.toggle('thought',thought);
+  speech.style.display='block';
+  render();
+  if(seconds===null)return sleep(700).then(()=>speech.style.display='none');
+  return sleep(seconds*1000).then(()=>speech.style.display='none');
+}
+
+function linesToTree(lines){
+  const root=[],stack=[{indent:-1,arr:root}];
+  for(const raw of lines){
+    if(!raw.trim()||raw.trim().startsWith('//'))continue;
+    const indent=(raw.match(/^\s*/)||[''])[0].length;
+    while(stack.length>1&&indent<=stack[stack.length-1].indent)stack.pop();
+    const node={text:raw.trim(),children:[]};
+    stack[stack.length-1].arr.push(node);
+    stack.push({indent,arr:node.children});
+  }
+  return root;
+}
+
+function parseScripts(){
+  const tree=linesToTree(editor.value.split('\n'));
+  return tree.filter(n=>/^when (green flag clicked|this sprite clicked|I receive )/i.test(n.text));
+}
+
+function cleanExpression(s){
+  let x=s.trim();
+  x=x.replace(/^random\s+(.+?)\s+to\s+(.+)$/i,(_,a,b)=>`RANDOM(${a},${b})`);
+  x=x.replace(/^join\s+(.+?)\s+(.+)$/i,(_,a,b)=>`JOIN(${JSON.stringify(a)},${JSON.stringify(b)})`);
+  x=x.replace(/^round\s+(.+)$/i,(_,a)=>`ROUND(${a})`);
+  x=x.replace(/^([\s\S]+?)\s+mod\s+([\s\S]+)$/i,'MOD($1,$2)');
+  return x;
+}
+
+function evaluate(s){
+  let x=String(s).trim();
+  const r=/^random\s+(-?\d+(?:\.\d+)?)\s+to\s+(-?\d+(?:\.\d+)?)$/i.exec(x);
+  if(r)return Math.floor(Math.random()*(Number(r[2])-Number(r[1])+1))+Number(r[1]);
+  const j=/^join\s+(.+?)\s+(.+)$/i.exec(x);
+  if(j)return String(resolveAtom(j[1]))+String(resolveAtom(j[2]));
+  const ro=/^round\s+(.+)$/i.exec(x);
+  if(ro)return Math.round(Number(resolveAtom(ro[1])));
+  const mo=/^(.+?)\s+mod\s+(.+)$/i.exec(x);
+  if(mo)return Number(resolveAtom(mo[1]))%Number(resolveAtom(mo[2]));
+  const arithmetic=/^[-+*/%().\d\s]+$/.test(x);
+  if(arithmetic){
+    try{return Function('"use strict";return ('+x+')')()}
+    catch{}
+  }
+  return resolveAtom(x);
+}
+
+function resolveAtom(x){
+  x=String(x).trim();
+  if(/^"(?:[^"\\]|\\.)*"$/.test(x))return x.slice(1,-1);
+  if(/^'.*'$/.test(x))return x.slice(1,-1);
+  if(Object.prototype.hasOwnProperty.call(state.vars,x))return state.vars[x];
+  if(/^timer$/i.test(x))return ((performance.now()-state.startTime)/1000).toFixed(2);
+  if(/^answer$/i.test(x))return state.vars.answer??'';
+  if(/^mouse x$/i.test(x))return state.x-150;
+  if(/^mouse y$/i.test(x))return 115-state.y;
+  const n=Number(x);
+  return Number.isFinite(n)?n:x;
+}
+
+function condition(s){
+  const c=s.trim();
+  if(/^true$/i.test(c))return true;
+  if(/^false$/i.test(c))return false;
+  let m=c.match(/^(.+?)\s*([=!<>]+)\s*(.+)$/);
+  if(m){
+    const a=resolveAtom(m[1]),b=resolveAtom(m[3]),op=m[2];
+    if(op==='=')return String(a)===String(b);
+    if(op==='!=')return String(a)!==String(b);
+    if(op==='<')return Number(a)<Number(b);
+    if(op==='>')return Number(a)>Number(b);
+    if(op==='<=' )return Number(a)<=Number(b);
+    if(op==='>=')return Number(a)>=Number(b);
+  }
+  if(/^not\s+/i.test(c))return !condition(c.replace(/^not\s+/i,''));
+  return Boolean(resolveAtom(c));
+}
+
+async function runNodes(nodes){
+  for(const n of nodes){
+    if(state.stopped||state.deleted)return;
+    const t=n.text;
+    let m;
+
+    if(/^end script$/i.test(t))return'end-script';
+    if(/^end loop$/i.test(t))return'break';
+
+    if(/^repeat\s+/i.test(t)){
+      const count=Math.max(0,Math.floor(num(t.replace(/^repeat\s+/i,''))));
+      for(let i=0;i<count&&!state.stopped;i++){
+        const r=await runNodes(n.children);
+        if(r==='end-script')return r;
+        if(r==='break')break;
+      }
+      continue;
+    }
+
+    if(/^forever$/i.test(t)){
+      while(!state.stopped&&!state.deleted){
+        const r=await runNodes(n.children);
+        if(r==='end-script')return r;
+        if(r==='break')break;
+        await sleep(0);
+      }
+      continue;
+    }
+
+    m=t.match(/^if\s+(.+)$/i);
+    if(m&&!/\selse$/i.test(t)){
+      if(condition(m[1])){const r=await runNodes(n.children);if(r==='end-script')return r;if(r==='break')return'break'}
+      continue;
+    }
+
+    m=t.match(/^if\s+(.+?)\s+else$/i);
+    if(m){
+      if(condition(m[1])){const r=await runNodes(n.children);if(r==='end-script')return r;if(r==='break')return'break'}
+      continue;
+    }
+
+    if(/^when /i.test(t))continue;
+
+    if((m=t.match(/^move\s+(.+)\s+steps$/i))){
+      const d=num(m[1]),r=state.dir*Math.PI/180;
+      state.x+=Math.cos(r)*d; state.y-=Math.sin(r)*d;
+    }
+    else if((m=t.match(/^turn clockwise\s+(.+)\s+degrees$/i)))state.dir+=num(m[1]);
+    else if((m=t.match(/^turn counterclockwise\s+(.+)\s+degrees$/i)))state.dir-=num(m[1]);
+    else if((m=t.match(/^go to x:\s*(.+?)\s+y:\s*(.+)$/i))){state.x=150+num(m[1]);state.y=115-num(m[2])}
+    else if(/^go to random position$/i.test(t)){
+      const halfW=22*(state.size/100);
+      const halfH=22*(state.size/100);
+      state.x=halfW+Math.random()*(270-halfW*2);
+      state.y=halfH+Math.random()*(270-halfH*2);
+    }
+    else if((m=t.match(/^glide\s+(.+?)\s+seconds to x:\s*(.+?)\s+y:\s*(.+)$/i))){
+      const sec=Math.max(0,num(m[1])),tx=150+num(m[2]),ty=115-num(m[3]);
+      const sx=state.x,sy=state.y,steps=Math.max(1,Math.floor(sec*30));
+      for(let i=1;i<=steps&&!state.stopped;i++){state.x=sx+(tx-sx)*i/steps;state.y=sy+(ty-sy)*i/steps;render();await sleep(sec*1000/steps)}
+    }
+    else if((m=t.match(/^point in direction\s+(.+)$/i)))state.dir=num(m[1]);
+    else if(/^point towards mouse-pointer$/i.test(t))state.dir=Math.atan2(-(115-state.y),0)*180/Math.PI||90;
+    else if((m=t.match(/^change x by\s+(.+)$/i)))state.x+=num(m[1]);
+    else if((m=t.match(/^set x to\s+(.+)$/i)))state.x=150+num(m[1]);
+    else if((m=t.match(/^change y by\s+(.+)$/i)))state.y-=num(m[1]);
+    else if((m=t.match(/^set y to\s+(.+)$/i)))state.y=115-num(m[1]);
+    else if(/^if on edge, bounce$/i.test(t)){
+      if(state.x<22||state.x>278){state.dir=180-state.dir;state.x=Math.max(22,Math.min(278,state.x))}
+      if(state.y<22||state.y>248){state.dir=-state.dir;state.y=Math.max(22,Math.min(248,state.y))}
+    }
+    else if((m=t.match(/^set rotation style\s+(.+)$/i)))state.rotationStyle=m[1];
+
+    else if((m=t.match(/^say\s+(.+?)\s+for\s+(.+)\s+seconds$/i))){out('💬 '+m[1]);await showSpeech(String(resolveAtom(m[1])),num(m[2]))}
+    else if((m=t.match(/^say\s+(.+)$/i))){out('💬 '+m[1]);await showSpeech(String(resolveAtom(m[1])))}
+    else if((m=t.match(/^think\s+(.+?)\s+for\s+(.+)\s+seconds$/i))){out('💭 '+m[1]);await showSpeech(String(resolveAtom(m[1])),num(m[2]),true)}
+    else if((m=t.match(/^think\s+(.+)$/i))){out('💭 '+m[1]);await showSpeech(String(resolveAtom(m[1])),null,true)}
+    else if(/^show$/i.test(t))state.visible=true;
+    else if(/^hide$/i.test(t))state.visible=false;
+    else if((m=t.match(/^change size by\s+(.+)$/i)))state.size=Math.max(0,state.size+num(m[1]));
+    else if((m=t.match(/^set size to\s+(.+)%?$/i)))state.size=Math.max(0,num(m[1]));
+    else if(/^next costume$/i.test(t)){
+      if(state.costumes.length){state.currentCostume=(state.currentCostume+1)%state.costumes.length;loadCurrentCostume();updateMainCostumeList();}
+    }
+    else if((m=t.match(/^switch costume to\s+(.+)$/i))){
+      const wanted=m[1].replace(/^\[|\]$/g,'').trim().toLowerCase();
+      let ci=state.costumes.findIndex(c=>c.name.toLowerCase()===wanted);
+      if(ci<0)ci=state.costumes.findIndex(c=>c.name.toLowerCase().includes(wanted));
+      if(ci>=0){state.currentCostume=ci;loadCurrentCostume();updateMainCostumeList();out('👕 costume: '+state.costumes[ci].name)}else out('⚠ Costume not found: '+m[1]);
+    }
+    else if((m=t.match(/^switch backdrop to\s+(.+)$/i)))out('🖼 backdrop: '+m[1]);
+    else if((m=t.match(/^change effect\s+(.+)\s+by\s+(.+)$/i)))out('✨ effect '+m[1]+' changed by '+m[2]);
+    else if(/^clear graphic effects$/i.test(t))out('✨ graphic effects cleared');
+
+    else if((m=t.match(/^play sound\s+(.+) until done$/i)))await playSound(m[1],true);
+    else if((m=t.match(/^start sound\s+(.+)$/i)))await playSound(m[1],false);
+    else if(/^stop all sounds$/i.test(t))out('🔇 sounds stopped');
+    else if((m=t.match(/^change volume by\s+(.+)$/i)))state.volume=Math.max(0,Math.min(100,state.volume+num(m[1])));
+    else if((m=t.match(/^set volume to\s+(.+)%?$/i)))state.volume=Math.max(0,Math.min(100,num(m[1])));
+
+    else if((m=t.match(/^wait\s+(.+)\s+seconds$/i)))await sleep(num(m[1])*1000);
+
+    else if((m=t.match(/^broadcast\s+(.+?)\s+and wait$/i))){
+      const msg=m[1].replace(/^\[|\]$/g,'');
+      await broadcast(msg,true);
+    }
+    else if((m=t.match(/^broadcast\s+(.+)$/i))){
+      const msg=m[1].replace(/^\[|\]$/g,'');
+      broadcast(msg,false);
+    }
+    else if(/^stop all$/i.test(t)){state.stopped=true;return'end-script'}
+
+    else if((m=t.match(/^set\s+([A-Za-z_]\w*)\s+to\s+(.+)$/i)))state.vars[m[1]]=evaluate(m[2]);
+    else if((m=t.match(/^change\s+([A-Za-z_]\w*)\s+by\s+(.+)$/i)))state.vars[m[1]]=num(state.vars[m[1]]??0)+num(m[2]);
+    else if((m=t.match(/^show variable\s+(\w+)$/i)))out(m[1]+' = '+(state.vars[m[1]]??0));
+    else if((m=t.match(/^hide variable\s+(\w+)$/i)))out('Variable '+m[1]+' hidden');
+
+    else if((m=t.match(/^add item\s+(.+)\s+to\s+(\w+)$/i))){state.lists[m[2]]??=[];state.lists[m[2]].push(resolveAtom(m[1]))}
+    else if((m=t.match(/^delete all of\s+(\w+)$/i))){state.lists[m[1]]=[]}
+    else if((m=t.match(/^delete\s+(\d+) of\s+(\w+)$/i))){state.lists[m[2]]??=[];state.lists[m[2]].splice(num(m[1])-1,1)}
+    else if((m=t.match(/^insert\s+(.+)\s+at\s+(\d+) of\s+(\w+)$/i))){state.lists[m[3]]??=[];state.lists[m[3]].splice(Math.max(0,num(m[2])-1),0,resolveAtom(m[1]))}
+    else if((m=t.match(/^replace item\s+(\d+) of\s+(\w+) with\s+(.+)$/i))){state.lists[m[2]]??=[];state.lists[m[2]][num(m[1])-1]=resolveAtom(m[3])}
+    else if((m=t.match(/^show list\s+(\w+)$/i)))out(m[1]+' = ['+(state.lists[m[1]]??[]).join(', ')+']');
+    else if((m=t.match(/^hide list\s+(\w+)$/i)))out('List '+m[1]+' hidden');
+
+    else if((m=t.match(/^ask\s+(.+?)\s+and wait$/i))){const a=prompt(resolveAtom(m[1]));state.vars.answer=a??''}
+    else if(/^reset timer$/i.test(t))state.startTime=performance.now();
+    else if(/^set drag mode draggable$/i.test(t))state.drag=true;
+    else if(/^set drag mode not draggable$/i.test(t))state.drag=false;
+    else if(/^touching edge\?$/i.test(t))out((state.x<22||state.x>278||state.y<22||state.y>248)?'true':'false');
+    else if((m=t.match(/^key (.+) pressed\?$/i)))out('false');
+
+    else if((m=t.match(/^set result to\s+(.+)$/i)))state.vars.result=evaluate(m[1]);
+    else if(/^create clone of myself$/i.test(t))out('👯 clone created (prototype)');
+    else if(/^delete this clone$/i.test(t))state.deleted=true;
+
+    render();
+    await sleep(40);
+  }
+}
+
+async function broadcast(msg,wait){
+  const receivers=scripts.filter(s=>/^when I receive\s+/i.test(s.text)&&
+    s.text.replace(/^when I receive\s+/i,'').replace(/^\[|\]$/g,'').trim()===msg.trim());
+  const jobs=receivers.map(s=>runNodes(s.children));
+  if(wait)await Promise.all(jobs);
+  else jobs.forEach(j=>j.catch(e=>out('❌ '+e.message)));
+}
+
+async function greenFlag(){
+  state.stopped=false;state.deleted=false;state.startTime=performance.now();
+  scripts=parseScripts();
+  const jobs=scripts.filter(s=>/^when green flag clicked$/i.test(s.text)).map(s=>runNodes(s.children));
+  if(!jobs.length){
+    out('⚠ No "when green flag clicked" script found.');
+    return;
+  }
+  out('▶ Running...');
+  try{
+    await Promise.all(jobs);
+    if(!state.stopped)out('✓ Program finished.');
+  }catch(e){out('❌ '+e.message)}
+}
+
+document.getElementById('run').onclick=greenFlag;
+document.getElementById('stop').onclick=()=>{
+  state.stopped=true;
+  speech.style.display='none';
+  out('■ Stopped.');
+};
+document.getElementById('reset').onclick=()=>{
+  const assets={costumes:state.costumes,sounds:state.sounds};
+  state=structuredClone(initial);
+  state.costumes=assets.costumes;
+  state.sounds=assets.sounds;
+  state.currentCostume=0;
+  speech.style.display='none';
+  render();
+  updateMainCostumeList();
+  updateMainSoundList();
+  out('↻ Reset.');
+};
+
+
+
+/* ---------- Scratch-style tabs ---------- */
+const tabs=document.querySelectorAll('.tab');
+const codeView=document.getElementById('codeView');
+const costumeView=document.getElementById('costumeView');
+const soundView=document.getElementById('soundView');
+
+function switchTab(name){
+  tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  codeView.style.display=name==='code'?'flex':'none';
+  costumeView.classList.toggle('active',name==='costumes');
+  soundView.classList.toggle('active',name==='sounds');
+}
+tabs.forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+
+/* ---------- Full costume editor ---------- */
+const mainCanvas=document.getElementById('mainCostumeCanvas');
+const mctx=mainCanvas.getContext('2d');
+const costumeNames=document.getElementById('costumeNames');
+const costumeInfo=document.getElementById('costumeInfo');
+const mainCostumeFile=document.getElementById('costumeFileMain');
+let costumeTool='select';
+let drawingMain=false,lastMain={x:0,y:0};
+let undoStack=[];
+
+function mainPoint(e){
+  const r=mainCanvas.getBoundingClientRect();
+  return {x:(e.clientX-r.left)*mainCanvas.width/r.width,y:(e.clientY-r.top)*mainCanvas.height/r.height};
+}
+function saveUndo(){
+  undoStack.push(mctx.getImageData(0,0,mainCanvas.width,mainCanvas.height));
+  if(undoStack.length>30)undoStack.shift();
+}
+function saveMainCostume(){
+  if(!state.costumes[state.currentCostume])return;
+  state.costumes[state.currentCostume].src=mainCanvas.toDataURL('image/png');
+  loadCostumeOnSprite();
+}
+function renderMainCostume(){
+  mctx.clearRect(0,0,mainCanvas.width,mainCanvas.height);
+  const c=state.costumes[state.currentCostume];
+  costumeInfo.textContent=c?c.name:'Costume';
+  if(!c||!c.src)return;
+  const img=new Image();
+  img.onload=()=>{
+    const scale=Math.min(mainCanvas.width/img.width,mainCanvas.height/img.height,1);
+    const w=img.width*scale,h=img.height*scale;
+    mctx.drawImage(img,(mainCanvas.width-w)/2,(mainCanvas.height-h)/2,w,h);
+  };
+  img.src=c.src;
+}
+function escapeHtml(x){
+  return String(x).replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+
+function loadCostumeOnSprite(){
+  const c=state.costumes[state.currentCostume];
+  if(c&&c.src){
+    sprite.style.backgroundImage='url(\"'+c.src.replace(/\"/g,'\\"')+'\")';
+    sprite.style.backgroundSize='contain';
+    sprite.style.backgroundPosition='center';
+    sprite.style.backgroundRepeat='no-repeat';
+    sprite.style.backgroundColor='transparent';
+    sprite.textContent='';
+  }else{
+    sprite.style.backgroundImage='none';
+    sprite.style.backgroundColor='#ff8b24';
+    sprite.textContent='🐱';
+  }
+}
+function updateCostumeUI(){updateMainCostumeList()}
+function loadCurrentCostume(){renderMainCostume();if(typeof renderVectorCostume==='function')renderVectorCostume();loadCostumeOnSprite()}
+
+function updateMainCostumeList(){
+  costumeNames.innerHTML=state.costumes.map((c,i)=>
+    `<div class="costumeName ${i===state.currentCostume?'active':''}" data-i="${i}">
+      ${escapeHtml(c.name)}<small style="display:block;color:#999;margin-top:3px">${c.src?'custom':'empty'}</small>
+    </div>`).join('');
+  costumeNames.querySelectorAll('[data-i]').forEach(el=>{el.onclick=()=>{
+    state.currentCostume=Number(el.dataset.i);
+    undoStack=[];
+    renderMainCostume();loadCostumeOnSprite();updateMainCostumeList();
+  };el.ondblclick=()=>{state.currentCostume=Number(el.dataset.i);costumeNameInput.value=state.costumes[state.currentCostume].name;costumeNameInput.focus();costumeNameInput.select()}});
+}
+function setCostumeTool(tool){
+  costumeTool=tool;
+  document.querySelectorAll('.tool').forEach(b=>{
+    if(b.dataset.costumeTool)b.classList.toggle('active',b.dataset.costumeTool===tool);
+  });
+}
+[['costumeSelect','select'],['costumeBrush','brush'],['costumeEraser','eraser'],['costumeFill','fill'],['costumeLine','line'],['costumeRect','rect'],['costumeEllipse','ellipse'],['costumeText','text']].forEach(([id,tool])=>{
+  const b=document.getElementById(id);b.dataset.costumeTool=tool;b.onclick=()=>setCostumeTool(tool);
+});
+
+mainCanvas.addEventListener('pointerdown',e=>{
+  if(costumeTool==='select')return;
+  drawingMain=true;mainCanvas.setPointerCapture(e.pointerId);
+  saveUndo();lastMain=mainPoint(e);
+  if(costumeTool==='brush'||costumeTool==='eraser'){
+    mctx.strokeStyle=costumeTool==='eraser'?'rgba(0,0,0,1)':document.getElementById('costumeColor').value;
+    mctx.globalCompositeOperation=costumeTool==='eraser'?'destination-out':'source-over';
+    mctx.lineWidth=Number(document.getElementById('costumeBrushSize').value);
+    mctx.lineCap='round';mctx.lineJoin='round';
+    mctx.beginPath();mctx.moveTo(lastMain.x,lastMain.y);mctx.lineTo(lastMain.x+.1,lastMain.y+.1);mctx.stroke();
+    mctx.globalCompositeOperation='source-over';saveMainCostume();
+  }else if(costumeTool==='fill'){
+    // Simple flood fill implementation.
+    const x=Math.floor(lastMain.x),y=Math.floor(lastMain.y);
+    const img=mctx.getImageData(0,0,mainCanvas.width,mainCanvas.height);
+    const d=img.data,idx=(y*mainCanvas.width+x)*4,target=[d[idx],d[idx+1],d[idx+2],d[idx+3]];
+    const col=document.getElementById('costumeColor').value;
+    const n=parseInt(col.slice(1),16),fill=[n>>16,(n>>8)&255,n&255,255];
+    if(target.join(',')!==fill.join(',')){
+      const stack=[[x,y]];
+      const seen=new Uint8Array(mainCanvas.width*mainCanvas.height);
+      while(stack.length){
+        const [px,py]=stack.pop();if(px<0||py<0||px>=mainCanvas.width||py>=mainCanvas.height)continue;
+        const pi=py*mainCanvas.width+px;if(seen[pi])continue;
+        const di=pi*4;
+        if(d[di]!==target[0]||d[di+1]!==target[1]||d[di+2]!==target[2]||d[di+3]!==target[3])continue;
+        seen[pi]=1;d[di]=fill[0];d[di+1]=fill[1];d[di+2]=fill[2];d[di+3]=fill[3];
+        stack.push([px+1,py],[px-1,py],[px,py+1],[px,py-1]);
+      }
+      mctx.putImageData(img,0,0);saveMainCostume();
+    }
+    drawingMain=false;
+  }
+});
+mainCanvas.addEventListener('pointermove',e=>{
+  if(!drawingMain)return;
+  const q=mainPoint(e);
+  if(costumeTool==='brush'||costumeTool==='eraser'){
+    mctx.globalCompositeOperation=costumeTool==='eraser'?'destination-out':'source-over';
+    mctx.strokeStyle=costumeTool==='eraser'?'rgba(0,0,0,1)':document.getElementById('costumeColor').value;
+    mctx.lineWidth=Number(document.getElementById('costumeBrushSize').value);
+    mctx.lineCap='round';mctx.beginPath();mctx.moveTo(lastMain.x,lastMain.y);mctx.lineTo(q.x,q.y);mctx.stroke();
+    mctx.globalCompositeOperation='source-over';lastMain=q;saveMainCostume();
+  }
+});
+mainCanvas.addEventListener('pointerup',e=>{
+  if(!drawingMain)return;
+  const q=mainPoint(e);
+  if(costumeTool==='line'){
+    mctx.strokeStyle=document.getElementById('costumeColor').value;
+    mctx.lineWidth=Number(document.getElementById('costumeBrushSize').value);
+    mctx.beginPath();mctx.moveTo(lastMain.x,lastMain.y);mctx.lineTo(q.x,q.y);mctx.stroke();
+  }else if(costumeTool==='rect'){
+    mctx.strokeStyle=document.getElementById('costumeColor').value;
+    mctx.lineWidth=Number(document.getElementById('costumeBrushSize').value);
+    mctx.strokeRect(lastMain.x,lastMain.y,q.x-lastMain.x,q.y-lastMain.y);
+  }else if(costumeTool==='ellipse'){
+    mctx.strokeStyle=document.getElementById('costumeColor').value;
+    mctx.lineWidth=Number(document.getElementById('costumeBrushSize').value);
+    mctx.beginPath();mctx.ellipse((lastMain.x+q.x)/2,(lastMain.y+q.y)/2,Math.abs(q.x-lastMain.x)/2,Math.abs(q.y-lastMain.y)/2,0,0,Math.PI*2);mctx.stroke();
+  }else if(costumeTool==='text'){
+    const text=prompt('Text for costume:');
+    if(text){mctx.fillStyle=document.getElementById('costumeColor').value;mctx.font='24px Arial';mctx.fillText(text,q.x,q.y)}
+  }
+  if(costumeTool!=='brush'&&costumeTool!=='eraser'&&costumeTool!=='fill')saveMainCostume();
+  drawingMain=false;
+});
+mainCanvas.addEventListener('pointercancel',()=>drawingMain=false);
+
+document.getElementById('costumeUndo').onclick=()=>{
+  const last=undoStack.pop();if(last)mctx.putImageData(last,0,0),saveMainCostume();
+};
+document.getElementById('costumeClear').onclick=()=>{
+  saveUndo();mctx.clearRect(0,0,mainCanvas.width,mainCanvas.height);saveMainCostume();
+};
+document.getElementById('newCostumeMain').onclick=()=>{
+  state.costumes.push({name:'Costume'+(state.costumes.length+1),src:null});
+  state.currentCostume=state.costumes.length-1;undoStack=[];renderMainCostume();loadCostumeOnSprite();updateMainCostumeList();updateMainCostumeList();
+};
+document.getElementById('importCostumeMain').onclick=()=>mainCostumeFile.click();
+mainCostumeFile.onchange=()=>{
+  const f=mainCostumeFile.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    state.costumes.push({name:f.name.replace(/\.[^.]+$/,''),src:r.result});
+    state.currentCostume=state.costumes.length-1;undoStack=[];renderMainCostume();loadCostumeOnSprite();updateMainCostumeList();updateMainCostumeList();mainCostumeFile.value='';
+  };
+  r.readAsDataURL(f);
+};
+
+const costumeNameInput=document.getElementById('costumeNameInput');
+document.getElementById('renameCostumeMain').onclick=()=>{
+  const c=state.costumes[state.currentCostume];
+  if(!c)return;
+  const name=costumeNameInput.value.trim();
+  if(!name){costumeNameInput.focus();return}
+  c.name=name;
+  costumeNameInput.value='';
+  costumeInfo.textContent=name;
+  updateMainCostumeList();
+};
+costumeNameInput.onkeydown=e=>{if(e.key==='Enter')document.getElementById('renameCostumeMain').click()};
+
+/* ---------- Scratch-style sound tab ---------- */
+const soundNames=document.getElementById('soundNames');
+const soundSelected=document.getElementById('soundSelected');
+const soundWave=document.getElementById('soundWave');
+let selectedSound=0;
+
+function updateMainSoundList(){
+  if(!state.sounds.length){
+    soundNames.innerHTML='<div class="notice">No sounds</div>';
+    soundSelected.textContent='';soundWave.innerHTML='';document.getElementById('soundEmpty').style.display='block';return;
+  }
+  document.getElementById('soundEmpty').style.display='none';
+  selectedSound=Math.min(selectedSound,state.sounds.length-1);
+  soundNames.innerHTML=state.sounds.map((a,i)=>
+    `<div class="soundName ${i===selectedSound?'active':''}" data-i="${i}">${escapeHtml(a.name)}<small>Imported audio</small></div>`).join('');
+  soundNames.querySelectorAll('[data-i]').forEach(el=>{el.onclick=()=>{selectedSound=Number(el.dataset.i);updateMainSoundList()};el.ondblclick=()=>{selectedSound=Number(el.dataset.i);soundNameInput.value=state.sounds[selectedSound].name;soundNameInput.focus();soundNameInput.select()}});
+  const a=state.sounds[selectedSound];
+  soundSelected.textContent=a.name;
+  soundWave.innerHTML='';
+  const waveCanvas=document.createElement('canvas');waveCanvas.width=1000;waveCanvas.height=170;soundWave.appendChild(waveCanvas);
+  const wctx=waveCanvas.getContext('2d');
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return; const ac=new AudioCtx();
+  fetch(a.src).then(r=>r.arrayBuffer()).then(b=>ac.decodeAudioData(b)).then(buf=>{
+    const data=buf.getChannelData(0),step=Math.max(1,Math.floor(data.length/waveCanvas.width));
+    wctx.beginPath();
+    for(let x=0;x<waveCanvas.width;x++){let max=0;for(let j=0;j<step;j++)max=Math.max(max,Math.abs(data[x*step+j]||0));let y=85-max*75;if(x===0)wctx.moveTo(x,y);else wctx.lineTo(x,y)}
+    wctx.stroke();ac.close();
+  }).catch(()=>{});
+}
+const soundNameInput=document.getElementById('soundNameInput');
+document.getElementById('renameSoundMain').onclick=()=>{
+  const a=state.sounds[selectedSound];
+  if(!a)return;
+  const name=soundNameInput.value.trim();
+  if(!name){soundNameInput.focus();return}
+  a.name=name;
+  soundNameInput.value='';
+  updateMainSoundList();
+};
+soundNameInput.onkeydown=e=>{if(e.key==='Enter')document.getElementById('renameSoundMain').click()};
+
+document.getElementById('importSoundMain').onclick=()=>document.getElementById('soundFileMain').click();
+document.getElementById('soundFileMain').onchange=()=>{
+  const f=document.getElementById('soundFileMain').files[0];if(!f)return;
+  state.sounds.push({name:f.name.replace(/\.[^.]+$/,''),src:URL.createObjectURL(f)});
+  selectedSound=state.sounds.length-1;updateMainSoundList();updateMainSoundList();
+  document.getElementById('soundFileMain').value='';
+};
+document.getElementById('playSelectedSound').onclick=()=>{
+  if(state.sounds[selectedSound])playSound(state.sounds[selectedSound].name,false);
+};
+document.getElementById('stopSelectedSound').onclick=stopAllSounds;
+
+updateMainCostumeList();
+updateMainSoundList();
+renderMainCostume();
+
+/* ---------- Structured SVG costume editor ---------- */
+const vectorCanvas=document.getElementById('vectorCostumeCanvas');
+let vectorStart=null,vectorUndo=[],selectedVector=-1,dragOffset=null;
+function vectorData(){const c=state.costumes[state.currentCostume];c.vector??=[];return c.vector}
+function vectorSvg(objects=vectorData()){return `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="420" viewBox="0 0 520 420">${objects.map(vectorMarkup).join('')}</svg>`}
+function vectorMarkup(o){
+  const fill=o.fill??'none',stroke=o.stroke??'none',sw=o.strokeWidth??1;
+  if(o.type==='line')return `<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  if(o.type==='rect')return `<rect x="${o.x}" y="${o.y}" width="${o.width}" height="${o.height}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  if(o.type==='ellipse')return `<ellipse cx="${o.cx}" cy="${o.cy}" rx="${o.rx}" ry="${o.ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  if(o.type==='text')return `<text x="${o.x}" y="${o.y}" fill="${fill}" font-size="${o.fontSize||24}" font-family="sans-serif">${escapeHtml(o.text||'')}</text>`;
+  if(o.type==='polyline')return `<polyline points="${o.points}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(o.type==='path')return `<path d="${escapeHtml(o.d||'')}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  return '';
+}
+function renderVectorCostume(){
+  vectorCanvas.innerHTML='';
+  vectorData().forEach((o,i)=>{const holder=document.createElementNS('http://www.w3.org/2000/svg',o.type==='polyline'?'polyline':o.type);holder.outerHTML=vectorMarkup(o);});
+  vectorCanvas.innerHTML=vectorData().map((o,i)=>`<g class="vectorObject ${i===selectedVector?'selected':''}" data-index="${i}">${vectorMarkup(o)}</g>`).join('');
+  const box=selectedVector>=0?vectorBounds(vectorData()[selectedVector]):null;
+  if(box)vectorCanvas.insertAdjacentHTML('beforeend',`<rect class="selectionBox" x="${box.x-4}" y="${box.y-4}" width="${box.width+8}" height="${box.height+8}"/>`);
+  costumeInfo.textContent=state.costumes[state.currentCostume]?.name||'Costume';
+  state.costumes[state.currentCostume].src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(vectorSvg());loadCostumeOnSprite();
+}
+function vectorBounds(o){
+  if(!o)return null;
+  if(o.type==='line')return {x:Math.min(o.x1,o.x2),y:Math.min(o.y1,o.y2),width:Math.abs(o.x2-o.x1),height:Math.abs(o.y2-o.y1)};
+  if(o.type==='ellipse')return {x:o.cx-o.rx,y:o.cy-o.ry,width:o.rx*2,height:o.ry*2};
+  if(o.type==='polyline'){const p=o.points.trim().split(/\s+/).map(v=>v.split(',').map(Number));const xs=p.map(v=>v[0]),ys=p.map(v=>v[1]);return{x:Math.min(...xs),y:Math.min(...ys),width:Math.max(...xs)-Math.min(...xs),height:Math.max(...ys)-Math.min(...ys)}}
+  if(o.type==='path')return {x:0,y:0,width:520,height:420};
+  return {x:o.x,y:o.y-(o.type==='text'?(o.fontSize||24):0),width:o.type==='text'?Math.max(10,(o.text||'').length*(o.fontSize||24)*.55):o.width,height:o.type==='text'?(o.fontSize||24):o.height};
+}
+function saveVectorUndo(){vectorUndo.push(JSON.stringify(vectorData()));if(vectorUndo.length>30)vectorUndo.shift()}
+function vectorPoint(e){const r=vectorCanvas.getBoundingClientRect();return{x:(e.clientX-r.left)*520/r.width,y:(e.clientY-r.top)*420/r.height}}
+function vectorColor(){return document.getElementById('costumeColor').value}
+function objectAt(p){for(let i=vectorData().length-1;i>=0;i--){const b=vectorBounds(vectorData()[i]);if(b&&p.x>=b.x-8&&p.x<=b.x+b.width+8&&p.y>=b.y-8&&p.y<=b.y+b.height+8)return i}return -1}
+function moveObject(o,dx,dy){if(o.type==='line'){o.x1+=dx;o.x2+=dx;o.y1+=dy;o.y2+=dy}else if(o.type==='ellipse'){o.cx+=dx;o.cy+=dy}else if(o.type==='polyline'){o.points=o.points.trim().split(/\s+/).map(v=>{const q=v.split(',').map(Number);return `${q[0]+dx},${q[1]+dy}`}).join(' ')}else{o.x+=dx;o.y+=dy}}
+vectorCanvas.addEventListener('pointerdown',e=>{
+  const p=vectorPoint(e);vectorCanvas.setPointerCapture(e.pointerId);
+  if(costumeTool==='select'||costumeTool==='fill'||costumeTool==='eraser'){selectedVector=objectAt(p);if(costumeTool==='fill'&&selectedVector>=0){saveVectorUndo();vectorData()[selectedVector].fill=vectorColor()}if(costumeTool==='eraser'&&selectedVector>=0){saveVectorUndo();vectorData().splice(selectedVector,1);selectedVector=-1}dragOffset=selectedVector>=0?{x:p.x,y:p.y}:null;renderVectorCostume();return}
+  saveVectorUndo();vectorStart=p;
+  if(costumeTool==='brush')vectorData().push({type:'polyline',points:`${p.x},${p.y}`,stroke:vectorColor(),strokeWidth:Number(document.getElementById('costumeBrushSize').value)});
+});
+vectorCanvas.addEventListener('pointermove',e=>{if(!vectorStart&&(!dragOffset||selectedVector<0))return;const p=vectorPoint(e);
+  if(dragOffset&&selectedVector>=0){moveObject(vectorData()[selectedVector],p.x-dragOffset.x,p.y-dragOffset.y);dragOffset=p;renderVectorCostume()}
+  else if(costumeTool==='brush'){const o=vectorData().at(-1);o.points+=` ${p.x},${p.y}`;renderVectorCostume()}
+});
+vectorCanvas.addEventListener('pointerup',e=>{const p=vectorPoint(e);if(dragOffset){dragOffset=null;return}if(!vectorStart)return;const s=vectorStart,w=Number(document.getElementById('costumeBrushSize').value),color=vectorColor();
+  if(costumeTool==='line')vectorData().push({type:'line',x1:s.x,y1:s.y,x2:p.x,y2:p.y,stroke:color,strokeWidth:w});
+  if(costumeTool==='rect')vectorData().push({type:'rect',x:Math.min(s.x,p.x),y:Math.min(s.y,p.y),width:Math.abs(p.x-s.x),height:Math.abs(p.y-s.y),fill:'none',stroke:color,strokeWidth:w});
+  if(costumeTool==='ellipse')vectorData().push({type:'ellipse',cx:(s.x+p.x)/2,cy:(s.y+p.y)/2,rx:Math.abs(p.x-s.x)/2,ry:Math.abs(p.y-s.y)/2,fill:'none',stroke:color,strokeWidth:w});
+  if(costumeTool==='text'){const text=prompt('Text for costume:');if(text)vectorData().push({type:'text',x:p.x,y:p.y,text,fill:color,fontSize:24})}vectorStart=null;renderVectorCostume();updateMainCostumeList();
+});
+vectorCanvas.addEventListener('pointercancel',()=>{vectorStart=null;dragOffset=null});
+document.getElementById('costumeUndo').onclick=()=>{const old=vectorUndo.pop();if(old){state.costumes[state.currentCostume].vector=JSON.parse(old);selectedVector=-1;renderVectorCostume()}};
+document.getElementById('costumeClear').onclick=()=>{saveVectorUndo();state.costumes[state.currentCostume].vector=[];selectedVector=-1;renderVectorCostume()};
+document.getElementById('newCostumeMain').onclick=()=>{state.costumes.push({name:'Costume'+(state.costumes.length+1),src:null,vector:[]});state.currentCostume=state.costumes.length-1;vectorUndo=[];selectedVector=-1;renderVectorCostume();updateMainCostumeList()};
+function refreshVectorAfterCostumeChange(){vectorUndo=[];selectedVector=-1;renderVectorCostume();updateMainCostumeList()}
+const originalUpdateCostumes=updateMainCostumeList;
+updateMainCostumeList=()=>{originalUpdateCostumes();document.querySelectorAll('.costumeName').forEach(el=>el.onclick=()=>{state.currentCostume=Number(el.dataset.i);refreshVectorAfterCostumeChange()})};
+mainCostumeFile.onchange=()=>{const f=mainCostumeFile.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{
+  const doc=new DOMParser().parseFromString(String(reader.result),'image/svg+xml');if(doc.querySelector('parsererror')){out('⚠ Invalid SVG file.');return}
+  const objects=[];doc.querySelectorAll('rect,circle,ellipse,line,polyline,path,text').forEach(el=>{const a=n=>Number(el.getAttribute(n)||0),fill=el.getAttribute('fill')||'none',stroke=el.getAttribute('stroke')||'none',sw=a('stroke-width')||1;
+    if(el.tagName==='rect')objects.push({type:'rect',x:a('x'),y:a('y'),width:a('width'),height:a('height'),fill,stroke,strokeWidth:sw});
+    if(el.tagName==='ellipse')objects.push({type:'ellipse',cx:a('cx'),cy:a('cy'),rx:a('rx'),ry:a('ry'),fill,stroke,strokeWidth:sw});
+    if(el.tagName==='circle')objects.push({type:'ellipse',cx:a('cx'),cy:a('cy'),rx:a('r'),ry:a('r'),fill,stroke,strokeWidth:sw});
+    if(el.tagName==='line')objects.push({type:'line',x1:a('x1'),y1:a('y1'),x2:a('x2'),y2:a('y2'),stroke,strokeWidth:sw});
+    if(el.tagName==='polyline')objects.push({type:'polyline',points:el.getAttribute('points')||'',stroke,strokeWidth:sw});
+    if(el.tagName==='path')objects.push({type:'path',d:el.getAttribute('d')||'',fill,stroke,strokeWidth:sw});
+    if(el.tagName==='text')objects.push({type:'text',x:a('x'),y:a('y'),text:el.textContent||'',fill,fontSize:a('font-size')||24});
+  });
+  state.costumes.push({name:f.name.replace(/\.[^.]+$/,''),src:null,vector:objects});state.currentCostume=state.costumes.length-1;vectorUndo=[];selectedVector=-1;renderVectorCostume();updateMainCostumeList();mainCostumeFile.value='';
+};reader.readAsText(f)};
+state.costumes.forEach(c=>c.vector??=[]);renderVectorCostume();updateMainCostumeList();
+
+/* ---------- No-key AI and SB3 export ---------- */
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const chatHistory=[];
+function addChatMessage(role,text){const el=document.createElement('div');el.className='chatMessage '+role;el.textContent=text;chatMessages.appendChild(el);chatMessages.scrollTop=chatMessages.scrollHeight}
+function cleanAiText(text){return String(text).replace(/^```(?:scratch|text)?\s*/i,'').replace(/\s*```$/,'').trim()}
+function extractScratchCode(text){const cleaned=cleanAiText(text);return /when (green flag clicked|this sprite clicked|I receive )/i.test(cleaned)?cleaned:null}
+async function askAssistant(request){
+  chatHistory.push({role:'user',content:request});addChatMessage('user',request);
+  const button=document.getElementById('chatSend');button.disabled=true;addChatMessage('system','Thinking...');const pending=chatMessages.lastElementChild;
+  try{
+    const answer=localAssistant(request);
+    pending.remove();chatHistory.push({role:'assistant',content:answer});addChatMessage('assistant',answer);
+    const code=extractScratchCode(answer);if(code){editor.value=code;out('✦ Code from chat inserted. Review it before running.');editor.focus()}
+  }catch(e){pending.remove();addChatMessage('assistant','I could not process that request.');out('⚠ Assistant error.')}
+  finally{button.disabled=false}
+}
+document.getElementById('chatForm').onsubmit=e=>{e.preventDefault();const request=chatInput.value.trim();if(request){chatInput.value='';askAssistant(request)}};
+chatInput.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('chatForm').requestSubmit()}};
+function localCode(promptText){
+  const text=promptText.toLowerCase();
+  if(text.includes('bounce')||text.includes('rebond'))return `when green flag clicked\n  forever\n    move 10 steps\n    if on edge, bounce\n  end`;
+  if(text.includes('say')||text.includes('dire')||text.includes('hello')||text.includes('bonjour'))return `when green flag clicked\n  say Hello! for 2 seconds`;
+  return `when green flag clicked\n  say "${promptText.replace(/["\\]/g,'')}" for 2 seconds`;
+}
+function localAssistant(request){
+  const text=request.toLowerCase();
+  if(text.includes('explain')||text.includes('help')||text.includes('how'))return 'I can create Scratch text blocks for movement, speech, loops, conditions, variables and broadcasts. Ask me to make a specific program.';
+  return localCode(request);
+}
+document.getElementById('aiGenerate').onclick=async()=>{
+  switchTab('code');chatInput.focus();chatInput.value='Create a Scratch program that ';addChatMessage('system','Describe the program, then send your request.');
+};
+function crc32(data){let c=~0;for(const b of data){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(~c)>>>0}
+function u16(n){return[new Uint8Array([n&255,(n>>>8)&255])][0]}
+function u32(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}
+function zipStore(files){let parts=[],central=[],offset=0;for(const [name,data] of files){const n=new TextEncoder().encode(name),d=data instanceof Uint8Array?data:new TextEncoder().encode(data),head=new Uint8Array(30+n.length);head.set([80,75,3,4,20,0,0,0,0,0,0,0,0,0,...u32(crc32(d)),...u32(d.length),...u32(d.length),n.length&255,n.length>>>8,0,0],0);head.set(n,30);parts.push(head,d);const ch=new Uint8Array(46+n.length);ch.set([80,75,1,2,20,0,20,0,0,0,0,0,0,0,...u32(crc32(d)),...u32(d.length),...u32(d.length),n.length&255,n.length>>>8,0,0,0,0,0,0,0,0,...u32(offset)],0);ch.set(n,46);central.push(ch);offset+=head.length+d.length}const cd=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22);end.set([80,75,5,6,0,0,0,0,files.length&255,files.length>>>8,files.length&255,files.length>>>8,cd&255,(cd>>>8)&255,(cd>>>16)&255,(cd>>>24)&255,offset&255,(offset>>>8)&255,(offset>>>16)&255,(offset>>>24)&255,0,0]);return new Blob([...parts,...central,end],{type:'application/zip'})}
+async function svgPng(c){const image=new Image();image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(vectorSvg(c.vector||[]));await new Promise((r,j)=>{image.onload=r;image.onerror=j});const canvas=document.createElement('canvas');canvas.width=520;canvas.height=420;canvas.getContext('2d').drawImage(image,0,0);return new Promise(r=>canvas.toBlob(async b=>r(new Uint8Array(await b.arrayBuffer())),'image/png'))}
+document.getElementById('downloadSb3').onclick=async()=>{const files=[],costumes=[];for(let i=0;i<state.costumes.length;i++){state.currentCostume=i;const png=await svgPng(state.costumes[i]);const md5='costume'+i+'.png';files.push([md5,png]);costumes.push({name:state.costumes[i].name,bitmapResolution:1,md5ext:md5,rotationCenterX:260,rotationCenterY:210})}const project={targets:[{isStage:true,name:'Stage',variables:{},lists:{},broadcasts:{},blocks:{},comments:{},currentCostume:0,costumes:[],sounds:[],volume:100,layerOrder:0,tempo:60,videoState:'on',videoTransparency:50,videoYScale:100,videoXScale:100}],monitors:[],extensions:[],meta:{semver:'3.0.0',vm:'0.2.0',agent:'Text Scratch'},textScript:editor.value};project.targets.push({isStage:false,name:'Sprite1',variables:{},lists:{},broadcasts:{},blocks:{},comments:{},currentCostume:0,costumes,sounds:[],volume:100,layerOrder:1,visible:true,x:state.x-150,y:115-state.y,size:state.size,direction:state.dir,draggable:false,rotationStyle:'all around'});files.push(['project.json',JSON.stringify(project)]);const a=document.createElement('a');a.href=URL.createObjectURL(await zipStore(files));a.download='text-scratch.sb3';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);out('✓ Project downloaded as text-scratch.sb3')};
+
+/* Legacy side-panel costume editor removed: the real editor is the Costumes tab. */
+document.getElementById('downloadSb3').onclick=async()=>{
+  const button=document.getElementById('downloadSb3'),oldIndex=state.currentCostume;
+  button.disabled=true;out('⇩ Preparing project...');
+  try{
+    const files=[],costumes=[];
+    for(let i=0;i<state.costumes.length;i++){const png=await svgPng(state.costumes[i]),md5='costume'+i+'.png';files.push([md5,png]);costumes.push({name:state.costumes[i].name,bitmapResolution:1,md5ext:md5,rotationCenterX:260,rotationCenterY:210})}
+    const project={targets:[{isStage:true,name:'Stage',variables:{},lists:{},broadcasts:{},blocks:{},comments:{},currentCostume:0,costumes:[],sounds:[],volume:100,layerOrder:0,tempo:60,videoState:'on',videoTransparency:50,videoYScale:100,videoXScale:100}],monitors:[],extensions:[],meta:{semver:'3.0.0',vm:'0.2.0',agent:'Text Scratch'},textScript:editor.value};
+    project.targets.push({isStage:false,name:'Sprite1',variables:{},lists:{},broadcasts:{},comments:{},currentCostume:0,costumes,sounds:[],volume:100,layerOrder:1,visible:true,x:state.x-150,y:115-state.y,size:state.size,direction:state.dir,draggable:false,rotationStyle:'all around'});files.push(['project.json',JSON.stringify(project)]);
+    const url=URL.createObjectURL(zipStore(files)),link=document.createElement('a');link.href=url;link.download='text-scratch.sb3';link.style.display='none';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);out('✓ Project downloaded as text-scratch.sb3');
+  }catch(e){out('❌ Download failed: '+e.message)}finally{state.currentCostume=oldIndex;button.disabled=false}
+};
+/* ---------- Sound importing / playback ---------- */
+async function playSound(name,untilDone=false){
+  const clean=name.replace(/^\[|\]$/g,'').trim().toLowerCase();
+  const found=state.sounds.find(a=>a.name.toLowerCase()===clean) ||
+              state.sounds.find(a=>a.name.toLowerCase().includes(clean));
+  if(!found){out('⚠ Sound not found: '+name);return}
+  const audio=new Audio(found.src);
+  audio.volume=Math.max(0,Math.min(1,state.volume/100));
+  audioPlayers.add(audio);
+  audio.onended=()=>audioPlayers.delete(audio);
+  try{await audio.play()}catch{audioPlayers.delete(audio);out('⚠ The browser blocked sound playback. Click Green Flag again or interact with the page first.');return}
+  if(untilDone){
+    await new Promise(resolve=>{audio.onended=()=>{audioPlayers.delete(audio);resolve()}});
+  }
+}
+function stopAllSounds(){
+  for(const a of audioPlayers){a.pause();a.currentTime=0}
+  audioPlayers.clear();
+}
+
+
+updateMainSoundList();
+loadCostumeOnSprite();
+renderSpriteList();
+selectSprite('sprite-1');
+
+sprite.onclick=async()=>{
+  if(state.stopped)return;
+  scripts=parseScripts();
+  const jobs=scripts.filter(s=>/^when this sprite clicked$/i.test(s.text)).map(s=>runNodes(s.children));
+  if(jobs.length){out('🖱 Sprite clicked');await Promise.all(jobs)}
+};
+
+render();
+</script>
+</body>
+</html>
